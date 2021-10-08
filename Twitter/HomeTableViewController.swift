@@ -12,7 +12,6 @@ class HomeTableViewController: UITableViewController {
 
     var tweetArray = [NSDictionary]()
     var numberOfTweet: Int!
-    
     let myRefreshControl = UIRefreshControl()
     
     @IBAction func onLogout(_ sender: Any) {
@@ -22,9 +21,13 @@ class HomeTableViewController: UITableViewController {
         UserDefaults.standard.set(false, forKey: "userLoggedIn")
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        self.loadTweets()
+    }
+    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "tweetCell", for: indexPath) as! TweetCellTableViewCell
-        
         
         let user = self.tweetArray[indexPath.row]["user"] as! NSDictionary
         
@@ -38,6 +41,9 @@ class HomeTableViewController: UITableViewController {
             cell.profileImageView.image = UIImage(data: imageData)
         }
         
+        cell.setFavorited(tweetArray[indexPath.row]["favorited"] as! Bool)
+        cell.tweetId = tweetArray[indexPath.row]["id"] as! Int
+        cell.setRetweeted(tweetArray[indexPath.row]["retweeted"] as! Bool)
         return cell
     }
     
@@ -52,7 +58,6 @@ class HomeTableViewController: UITableViewController {
             for tweet in tweets {
                 self.tweetArray.append(tweet)
             }
-            
             self.tableView.reloadData()
             self.myRefreshControl.endRefreshing()
         }, failure: {(Error) in
@@ -71,7 +76,6 @@ class HomeTableViewController: UITableViewController {
             for tweet in tweets {
                 self.tweetArray.append(tweet)
             }
-
             self.tableView.reloadData()
             self.myRefreshControl.endRefreshing()
         }, failure: {(Error) in
